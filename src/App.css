@@ -1,8 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap");
+
 /* General styles */
 body {
-  font-family: Arial, sans-serif;
-  background: url("./assets/bookshelf.jpg");
-  background-position: center;
+  font-family: "Quicksand", sans-serif;
+  background: url("./assets/bookshelf.jpg") no-repeat center center fixed;
+  background-size: cover;
   margin: 0;
   padding: 0;
   display: flex;
@@ -10,6 +12,14 @@ body {
   align-items: center;
   min-height: 100vh;
   color: #ffffff;
+}
+
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+  color: #aaa; /* Change this to your desired color */
+  opacity: 1; /* Ensure full opacity */
+  font-style: italic; /* Optional: make it italic */
 }
 
 /* App container */
@@ -41,7 +51,7 @@ select {
   border: 1px solid #555;
   border-radius: 5px;
   margin: 10px;
-  background: #000;
+  background: #5d5d5d;
   color: #fff;
 }
 

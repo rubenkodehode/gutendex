@@ -75,7 +75,8 @@ const App = () => {
 
   return (
     <div className={`App ${loading ? "loading" : ""}`}>
-      <h1>Autocomplete Book Search</h1>
+      <h1>GutenDex</h1>
+      <h3>A Book Search Index</h3>
       <Autocomplete searchText={searchText} setSearchText={setSearchText} />
       <div className="filters">
         <input
@@ -95,9 +96,21 @@ const App = () => {
           onChange={(e) => setLanguageFilter(e.target.value)}>
           <option value="">All Languages</option>
           <option value="en">English</option>
-          <option value="fr">French</option>
-          <option value="de">German</option>
-          <option value="es">Spanish</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="es">Español</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="nl">Nederlands</option>
+          <option value="ru">Русский</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="ar">عربي</option>
+          <option value="hi">हिन्दी</option>
+          <option value="sv">Svenska</option>
+          <option value="no">Norsk</option>
+          <option value="da">Dansk</option>
+          <option value="fi">Suomeksi</option>
         </select>
       </div>
       {loading && <div className="spinner"></div>}

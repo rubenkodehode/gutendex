@@ -110,7 +110,7 @@ const App = () => {
           <option value="sv">Svenska</option>
           <option value="no">Norsk</option>
           <option value="da">Dansk</option>
-          <option value="fi">Suomeksi</option>
+          <option value="fi">Suomi</option>
         </select>
       </div>
       {loading && <div className="spinner"></div>}

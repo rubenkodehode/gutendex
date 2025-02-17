@@ -2,82 +2,58 @@ import React, { useState, useEffect } from "react";
 import Autocomplete from "./components/Autocomplete";
 import SearchResults from "./components/SearchResults";
 import BookDetails from "./components/BookDetails";
+import Modal from "react-modal";
 import "./App.css";
 
+Modal.setAppElement("#root");
+
 const App = () => {
-  const [searchText, setSearchText] = useState("");
   const [results, setResults] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [authorFilter, setAuthorFilter] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
+  const [authorFilter, setAuthorFilter] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (!searchText && !subjectFilter) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+  const filteredResults = results.filter((book) => {
+    const matchesLanguage =
+      !languageFilter || book.languages.includes(languageFilter);
 
-    const fetchBooks = async () => {
-      setLoading(true);
-      setError(null);
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      try {
-        let query = searchText || subjectFilter;
-        let url = `https://gutendex.com/books?search=${query}`;
+    const matchesSubject =
+      !subjectFilter ||
+      book.subjects.some((subject) =>
+        subject.toLowerCase().includes(subjectFilter.toLowerCase())
+      );
 
-        if (languageFilter) {
-          url += `&languages=${languageFilter}`;
-        }
+    const matchesAuthor =
+      !authorFilter || // Ikke filtrer hvis feltet er tomt
+      book.authors.some((author) =>
+        author.name.toLowerCase().includes(authorFilter.toLowerCase())
+      );
 
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
+    return matchesLanguage && matchesSubject && matchesAuthor;
+  });
 
-        if (!response.ok) throw new Error("Failed to fetch books");
+  const handleSelectBook = (book) => {
+    setSelectedBook(book);
+    setIsModalOpen(true);
+  };
 
-        const data = await response.json();
-
-        let filteredResults = data.results;
-
-        if (authorFilter) {
-          filteredResults = filteredResults.filter((book) =>
-            book.authors.some((author) =>
-              author.name.toLowerCase().includes(authorFilter.toLowerCase())
-            )
-          );
-        }
-
-        setResults(filteredResults);
-      } catch (err) {
-        if (err.name === "AbortError") {
-          setError("Request timed out. Please try again later.");
-        } else {
-          setError(err.message);
-        }
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const debounceTimeout = setTimeout(fetchBooks, 500);
-    return () => clearTimeout(debounceTimeout);
-  }, [searchText, authorFilter, languageFilter, subjectFilter]);
-
-  const handleSubjectClick = (subject) => {
-    setSubjectFilter(subject);
-    setSearchText(subject);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBook(null);
   };
 
   return (
-    <div className={`App ${loading ? "loading" : ""}`}>
+    <div className="App">
       <h1>GutenDex</h1>
       <h3>A Book Search Index</h3>
-      <Autocomplete searchText={searchText} setSearchText={setSearchText} />
+      <Autocomplete
+        setResults={setResults}
+        setLoading={setLoading}
+        setSelectedBook={setSelectedBook}
+      />
       <div className="filters">
         <input
           type="text"
@@ -95,34 +71,32 @@ const App = () => {
           value={languageFilter}
           onChange={(e) => setLanguageFilter(e.target.value)}>
           <option value="">All Languages</option>
-          <option value="en">English</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-          <option value="es">Español</option>
-          <option value="it">Italiano</option>
-          <option value="pt">Português</option>
-          <option value="nl">Nederlands</option>
-          <option value="ru">Русский</option>
-          <option value="zh">中文</option>
-          <option value="ja">日本語</option>
-          <option value="ar">عربي</option>
-          <option value="hi">हिन्दी</option>
-          <option value="sv">Svenska</option>
-          <option value="no">Norsk</option>
-          <option value="da">Dansk</option>
-          <option value="fi">Suomi</option>
+          {[...new Set(results.flatMap((book) => book.languages))].map(
+            (lang) => (
+              <option key={lang} value={lang}>
+                {lang}
+              </option>
+            )
+          )}
         </select>
       </div>
       {loading && <div className="spinner"></div>}
-      {error && <p className="error">{error}</p>}
-      {selectedBook && (
-        <BookDetails book={selectedBook} onSubjectClick={handleSubjectClick} />
-      )}
-      <SearchResults
-        results={results}
-        onSelectBook={setSelectedBook}
-        displayAsCards={true}
-      />
+      <SearchResults results={results} onSelectBook={handleSelectBook} />
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Book Details">
+        {selectedBook && (
+          <BookDetails
+            book={selectedBook}
+            onSetSubjectFilter={(subject) => {
+              setSubjectFilter(subject);
+              setIsModalOpen(false);
+            }}
+          />
+        )}
+        <button onClick={closeModal}>&times;</button>
+      </Modal>
     </div>
   );
 };

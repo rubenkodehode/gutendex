@@ -13,11 +13,11 @@ const SearchResults = ({ results, onSelectBook }) => {
           key={book.id}
           onClick={() => handleBookClick(book)}>
           <img
-            src={book.formats["image/jpeg"] || "placeholder-image-url"}
+            src={book.formats["image/jpeg"] || "placeholder.jpg"}
             alt={book.title}
             className="book-cover"
           />
-          <h3 title={book.title}>{book.title}</h3>
+          <h3>{book.title}</h3>
           <p>{book.authors.map((author) => author.name).join(", ")}</p>
         </div>
       ))}
